@@ -263,8 +263,8 @@ function unifiedEdits(lines: string[], strict: boolean): Edit[] {
       continue;
     }
     if (cur !== null && cur.hunks.length === 0) {
-      if (l.startsWith('rename from ')) cur.oldPath = l.slice(12).trim();
-      else if (l.startsWith('rename to ')) cur.newPath = l.slice(10).trim();
+      if (l.startsWith('rename from ') && cur.oldPath === null) cur.oldPath = l.slice(12).trim();
+      else if (l.startsWith('rename to ') && cur.newPath === null) cur.newPath = l.slice(10).trim();
       else if (l.startsWith('new file mode')) cur.creation = true;
       else if (l.startsWith('deleted file mode')) cur.deletion = true;
     }
@@ -715,7 +715,7 @@ function run(args: string[]): { code: number; out: string[] } {
   const rows: Array<{ key: string; line: string }> = [];
   const movedPaths = new Set<string>();
   for (const m of tree.moves) {
-    if (tree.original(m.old) !== null && tree.now.get(m.old) === null && tree.original(m.next) === null && tree.now.get(m.next) !== null && tree.now.get(m.next) !== tree.original(m.old)) {
+    if (tree.original(m.old) !== null && tree.now.get(m.old) === null && tree.original(m.next) === null && tree.now.get(m.next) !== null) {
       rows.push({ key: m.next, line: `R ${m.old} -> ${m.next}` });
       movedPaths.add(m.old);
       movedPaths.add(m.next);
